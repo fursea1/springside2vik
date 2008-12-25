@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="build-tomcat-quickstart" default="tomcat.start">
+	<!-- =========================================
+			 获取Tomcat Home 目录
+			 ========================================= -->
+	<target name="tomcat.home.fetch">
+		<propertyfile file="bin/build_user.properties">
+			<entry key="tomcat.port" default="8080"/>
+			<entry key="tomcat.home" default="../../misc/servers/tomcat-5.5.17"/>
+		</propertyfile>
+
+		<property file="bin/build_user.properties"/>
+
+		<echo message="注意：Tomcat端口为${tomcat.port}，如果不符请修改bin/build_user.properties"/>
+
+		<if>
+			<or>
+				<equals arg1="${tomcat.home}" arg2=""/>
+				<equals arg1="${tomcat.home}" arg2="."/>
+				<not>
+					<available file="${tomcat.home}"/>
+				</not>
+			</or>
+			<then>
+				<input message="请输入Tomcat的安装路径:"
+					   addproperty="catalina.dir"/>
+				<fail message="你必须设定正确的Tomcat安装路径">
+					<condition>
+						<or>
+							<equals arg1="${catalina.dir}" arg2=""/>
+							<not>
+								<available file="${catalina.dir}"/>
+							</not>
+						</or>
+					</condition>
+				</fail>
+				<propertyfile file="bin/build_user.properties">
+					<entry key="tomcat.home" value="${catalina.dir}"/>
+				</propertyfile>
+			</then>
+			<else>
+				<property name="catalina.dir" value="${tomcat.home}"/>
+			</else>
+		</if>
+	</target>
+
+	<!-- =========================================
+			 启动 Tomcat
+			 ========================================= -->
+	<target name="tomcat.start">
+		<java classname="org.apache.catalina.startup.Bootstrap" fork="true">
+			<jvmarg value="-Djava.endorsed.dirs=${catalina.dir}/common/endorsed"/>
+			<jvmarg value="-Dcatalina.base=${catalina.dir}"/>
+			<jvmarg value="-Dcatalina.home=${catalina.dir}"/>
+			<jvmarg value="-Djava.io.tmpdir=${catalina.dir}/temp"/>
+			<arg value="start"/>
+			<classpath>
+				<pathelement location="${catalina.dir}/bin/bootstrap.jar"/>
+			</classpath>
+		</java>
+	</target>
+
+	<!-- =========================================
+			 关闭 Tomcat
+			 ========================================= -->
+	<target name="tomcat.stop">
+		<echo message="停止Tomcat Web Server..."/>
+		<java classname="org.apache.catalina.startup.Bootstrap" spawn="yes" fork="true">
+			<jvmarg value="-Djava.endorsed.dirs=${catalina.dir}/common/endorsed"/>
+			<jvmarg value="-Dcatalina.base=${catalina.dir}"/>
+			<jvmarg value="-Dcatalina.home=${catalina.dir}"/>
+			<jvmarg value="-Djava.io.tmpdir=${catalina.dir}/temp"/>
+			<arg value="stop"/>
+			<classpath>
+				<pathelement location="${catalina.dir}/bin/bootstrap.jar"/>
+			</classpath>
+		</java>
+		<waitfor maxwait="10" maxwaitunit="minute" checkevery="1" checkeveryunit="second">
+			<not>
+				<http url="http://localhost:${tomcat.port}"/>
+			</not>
+		</waitfor>
+		<echo message="Tomcat Web Server已停止"/>
+	</target>
+
+	<target name="tomcat.deploy">
+		<!-- 获得tomcat home 路径 -->
+		<antcallback target="tomcat.home.fetch" return="catalina.dir,tomcat.port"/>
+
+		<sync todir="${catalina.dir}/webapps/${ant.project.name}">
+			<fileset dir="${web.dir}"/>
+		</sync>
+	</target>
+
+	<target name="tomcat.quickstart" depends="tomcat.deploy">
+		<!--并行的启动Tomcat和浏览器-->
+		<parallel>
+			<!-- 启动Tomcat -->
+			<antcall target="tomcat.start"/>
+			<sequential>
+				<!-- 等待Tomcat启动完毕 -->
+				<waitfor maxwait="10" maxwaitunit="minute" checkevery="1" checkeveryunit="second">
+					<http url="http://localhost:${tomcat.port}"/>
+				</waitfor>
+				<!-- 启动 IE浏览项目页面-->
+				<exec executable="cmd.exe">
+					<arg line="/c start http://localhost:${tomcat.port}/${ant.project.name}"/>
+				</exec>
+			</sequential>
+		</parallel>
+	</target>
+</project>
