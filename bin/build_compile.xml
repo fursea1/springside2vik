@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 本脚本负责编译主Java代码与测试代码,复制资源文件 以及War文件打包
+     其中目录定义与ant task定义 在build_base.xml -->
+<project name="build-compile-quickstart" default="compile">
+	<!-- ===================================
+			 定义Class Path
+		 ==================================== -->
+	<path id="compile.classpath">
+		<fileset dir="${web.dir}/WEB-INF/lib" includes="*.jar"/>
+		<fileset dir="lib" includes="**/*.jar"/>
+		<fileset dir="${codegen.dir}/lib" includes="*.jar"/>
+	</path>
+
+	<!--定义编译选项-->
+	<property name="compiler.args" value="-encoding UTF-8"/>
+
+	<patternset id="compiler.resources">
+		<exclude name="**/?*.java"/>
+	</patternset>
+
+	<!-- 检查环境 -->
+	<target name="check-env">
+		<!-- 检查JDK版本为5.0 -->
+		<!--fail message="Must Set the JAVA_HOME to JDK5.0">
+			<condition>
+				<not>
+					<equals arg1="${ant.java.version}" arg2="1.5"/>
+				</not>
+			</condition>
+		</fail-->
+	</target>
+
+	<!-- ===================================
+				 编译Java文件并复制资源文件
+				 ==================================== -->
+	<target name="compile" depends="check-env,init,i18n" description="编译Java文件并复制资源文件">
+		<if>
+	        <and>
+	        	<available file="${codegen.src.dir}"/>
+	        	<available file="${src.dir}"/>
+	        </and>
+			<then>
+				<javac destdir="${build.dir}" debug="true">
+					<compilerarg line="${compiler.args}"/>
+					<src path="${codegen.src.dir};${src.dir}"/>
+					<classpath refid="compile.classpath"/>
+				</javac>
+			</then>
+		</if>
+
+		<copy_resource resources.dir="${src.dir}" build.dir="${build.dir}"/>
+		<copy_resource resources.dir="${resources.dir}" build.dir="${build.dir}"/>
+	</target>
+
+	<macrodef name="copy_resource">
+		<attribute name="build.dir"/>
+		<attribute name="resources.dir"/>
+		<sequential>
+			<!-- 复制resource下的资源文件到classes目录 -->
+			<if>
+				<available file="@{resources.dir}"/>
+				<then>
+					<copy todir="@{build.dir}">
+						<fileset dir="@{resources.dir}">
+							<patternset refid="compiler.resources"/>
+						</fileset>
+					</copy>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!-- ===================================
+			 中文i18N文件进行UTF-8转换
+			 ==================================== -->
+	<target name="i18n" description="中文i18N文件进行UTF-8转换">
+		<if>
+			<available file="${resources.dir}/i18n/cn"/>
+			<then>
+				<native2ascii src="${resources.dir}/i18n/cn" dest="${resources.dir}/i18n" encoding="UTF-8"/>
+			</then>
+		</if>
+	</target>
+
+	<!-- ===================================
+				 生成war文件
+				 ==================================== -->
+	<target name="war" depends="compile" description="生成war文件">
+		<mkdir dir="${target.dir}/war/"/>
+		<!--定义时间戳-->
+		<tstamp>
+			<format property="datestamp" pattern="yyyy-MM-dd"/>
+		</tstamp>
+		<war destfile="${release.warfile}" webxml="${web.dir}/WEB-INF/web.xml" basedir="${web.dir}"
+			 excludes="**/web.xml">
+			<manifest>
+				<section name="Shared">
+					<attribute name="Date" value="${datestamp}"/>
+				</section>
+
+				<section name="Copyright">
+					<attribute name="Copy" value="(C) ${ant.project.name} 2006"/>
+				</section>
+			</manifest>
+		</war>
+	</target>
+</project>

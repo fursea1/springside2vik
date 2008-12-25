@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     可在各项目中重用的build.xml基础文件
+     本脚本负责定义目录,定义Ant-Contrib 与 Maven2 task,
+     并引入其余四个可重用Build文件.
+     最后显示用户可选择的任务,以及init,clean,update任务的定义
+ -->
+<project name="build-main-quickstart" default="usage" xmlns:artifact="urn:maven-artifact-ant">
+	<!-- ======================================
+			 定义系统目录
+			 ======================================= -->
+	<property name="src.dir" value="src/java"/>
+	<property name="codegen.dir" value="codegen"/>
+	<property name="codegen.src.dir" value="${codegen.dir}/src"/>
+	<property name="resources.dir" value="src/resources/"/>
+	<property name="web.dir" value="WebRoot"/>
+	<property name="build.dir" value="${web.dir}/WEB-INF/classes"/>
+	<property name="target.dir" value="target"/>
+	<property name="release.warfile" value="${target.dir}/war/${ant.project.name}.war"/>
+
+	<!-- ======================================
+			 定义Ant-Contrib 与 Maven2 task
+			 ======================================= -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="lib/ant/ant-contrib.jar"/>
+		</classpath>
+	</taskdef>
+
+	<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
+		<classpath>
+			<pathelement location="lib/ant/maven-artifact-ant-2.0.4-dep.jar"/>
+		</classpath>
+	</typedef>
+
+	<!-- ======================================
+			 引入其余四个可重用build模块
+			 ======================================= -->
+	<!-- 编译脚本 -->
+	<import file="build_compile.xml"/>
+	<!--tomcat服务器启停脚本 -->
+	<import file="build_tomcat.xml"/>
+
+	<!-- ===================================
+			 显示可选任务，并按用户的选择执行任务
+			 ==================================== -->
+	<target name="usage" description="显示可选任务">
+		<echo message="${ant.project.name} Build 文件"/>
+		<echo message="------------------------------------------------------"/>
+		<echo message="可选Target:"/>
+		<echo message=""/>
+		<echo message="quickstart    --&gt; 快速启动项目"/>
+		<echo message="compile       --&gt; 编译Java文件并复制资源文件"/>
+		<echo message="war           --&gt; 生成项目war文件"/>
+
+		<input message="请选择一个Target"
+			   validargs="quickstart,compile,war,clean"
+			   addproperty="ant.task"/>
+		<antcall target="${ant.task}"/>
+	</target>
+
+	<!-- ===================================
+			 初始化项目,建立目录并更新项目的依赖jar.
+		 ==================================== -->
+	<target name="init">
+		<mkdir dir="${build.dir}"/>
+	</target>
+
+	<!-- ===================================
+			 清理项目,删除classes目录
+			 ==================================== -->
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+
+	<!-- ===================================
+			 快速开始项目，编译项目，部署到tomcat并打开浏览器
+		 ==================================== -->
+	<target name="quickstart" depends="compile,tomcat.quickstart"/>
+
+	<target name="deploy" depends="compile,tomcat.deploy"/>
+</project>
