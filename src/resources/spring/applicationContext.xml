@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	   default-autowire="byName" default-lazy-init="true">
+
+	<!-- 属性文件读入 -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath*:config/hibernate.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!--远程接口管理类，这个类需要设置成单例-->
+	<bean id="remoteInterface" class="com.shareinfo.eim.remote.RemoteInterface" scope="singleton">
+		<property name="oldRmiAddr">
+			<value>rmi://192.168.18.4:1199/eimService</value>
+		</property>
+	</bean>
+
+	<!-- 支持 @Transactional 标记 -->
+	<tx:annotation-driven/>
+
+	<!-- 支持 @AspectJ 标记-->
+	<aop:aspectj-autoproxy/>
+	
+	<bean id="eimServiceAop" class="com.shareinfo.eim.remote.EimServiceAop">
+	</bean>
+
+	<!-- 以AspectJ方式 定义 AOP -->
+	<aop:config proxy-target-class="true">
+		<!-- 注意,请把第2个*号换为项目package -->
+		<aop:advisor pointcut="execution(* org.springside.core.dao.*Dao.*(..))" advice-ref="txAdvice"/>
+		<aop:advisor pointcut="execution(* org.vicalloy..service.*Manager.*(..))" advice-ref="txAdvice"/>
+	</aop:config>
+
+	<!-- 基本事务定义,使用transactionManager作事务管理,默认get*方法的事务为readonly,其余方法按默认设置.
+			 默认的设置请参考Spring文档事务一章. -->
+	<tx:advice id="txAdvice">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="find*" read-only="true"/>
+			<tx:method name="*"/>
+		</tx:attributes>
+	</tx:advice>
+</beans>
