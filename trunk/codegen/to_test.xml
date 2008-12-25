@@ -1,0 +1,17 @@
+	<action-mappings>
+		<!--使用通配符,对/admin/book 与 /admin/order进行批量配置-->
+		<action path="/admin/*" name="{1}Form" parameter="method" scope="request" validate="false">
+			<forward name="list" path="/WEB-INF/pages/admin/{1}List.jsp"/>
+			<forward name="edit" path="/WEB-INF/pages/admin/{1}Form.jsp"/>
+			<forward name="view" path="/WEB-INF/pages/admin/{1}View.jsp"/>
+			<forward name="success" path="/admin/{1}.do" redirect="true"/>
+		</action>
+		<action path="/d_**/*" name="{2}Form" parameter="method" scope="request" validate="false">
+			<forward name="list" path="/WEB-INF/pages/{1}/{2}List.jsp"/>
+			<forward name="edit" path="/WEB-INF/pages/{1}/{2}Form.jsp"/>
+			<forward name="view" path="/WEB-INF/pages/{1}/{2}View.jsp"/>
+			<forward name="success" path="/d_{1}/{2}.do" redirect="true"/>
+		</action>		
+	</action-mappings>
+	
+	${r"${ctx}"}${entityInfo.springBeanActionPath}.do
