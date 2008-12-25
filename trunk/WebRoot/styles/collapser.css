@@ -1,0 +1,59 @@
+.pkg h3 {
+    padding-left:34px;
+    font:normal 12px verdana,helvetica,tahoma,sans-serif;
+    height:18px;
+    cursor:pointer;
+
+    /*background:#eee url(../images/cmp-bg.gif) repeat-x;
+    margin-top:1px;
+    border-top:1px solid #ddd;
+    border-bottom:1px solid #ccc;
+    padding-top:2px;
+    padding-bottom:1px;*/
+}
+.pkg h3 img.cmp{
+    //background-image:url(../shared/icons/fam/plugin.gif);
+}
+
+h3.collapser-expanded{
+    background: #C3DAF9 url(../images/pkg-open.gif) no-repeat 0px -1px;
+    /*background:#eee url(../images/cmp-bg.gif) repeat-x;
+    margin-top:1px;
+    border-top:1px solid #ddd;
+    border-bottom:1px solid #ccc;
+    padding-top:2px;
+    padding-bottom:1px;*/
+	
+}
+h3.collapser-collapsed {
+    background: #C3DAF9 url(../images/pkg-closed.gif) no-repeat 0px -1px;
+    /*background:#eee url(../images/cmp-bg.gif) repeat-x;
+    margin-top:1px;
+    border-top:1px solid #ddd;
+    border-bottom:1px solid #ccc;
+    padding-top:2px;
+    padding-bottom:1px;*/
+	
+}
+.pkg-body{
+    margin-left:16px;
+    font:normal 12px verdana,helvetica,tahoma,sans-serif;
+}
+#classes a{
+    font:normal 12px verdana,helvetica,tahoma,sans-serif;
+    display:block;
+    text-decoration:none;
+    height:18px;
+    color:black;
+    background: #fff url(../images/class.gif) no-repeat 16px -1px;
+    padding-left:34px;
+    -moz-outline:none;
+    outline:none;
+	 white-space: nowrap;
+}
+#classes a:hover{
+	text-decoration: underline;
+}
+#classes a.ex{
+    background: #fff url(../images/example.gif) no-repeat 16px -1px;
+}
