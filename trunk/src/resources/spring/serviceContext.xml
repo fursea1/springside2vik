@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans default-lazy-init="true" default-autowire="byName">
+	<bean id="logManager" class="org.vicalloy.quickstart.security.service.LogManager"/>
+	<bean id="masterFunctionManager" class="org.vicalloy.quickstart.security.service.MasterFunctionManager"/>
+	<bean id="subFunctionManager" class="org.vicalloy.quickstart.security.service.SubFunctionManager"/>
+	<bean id="userManager" class="org.vicalloy.quickstart.security.service.UserManager"/>
+	<bean id="roleManager" class="org.vicalloy.quickstart.security.service.RoleManager"/>
+	<!-- new_bean -->
+</beans>
