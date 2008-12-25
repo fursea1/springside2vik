@@ -1,0 +1,3 @@
+<form name="${entityInfo.strutsFormName}">
+		</form>
+		<!-- new_form -->

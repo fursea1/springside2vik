@@ -1,0 +1,2 @@
+<form-bean name="${entityInfo.strutsFormName}" type="org.apache.struts.validator.LazyValidatorForm"/>
+		<!-- new_form_bean -->

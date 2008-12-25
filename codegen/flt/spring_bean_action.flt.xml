@@ -1,0 +1,2 @@
+<bean name="${entityInfo.springBeanActionPath}" class="${entityInfo.actionName}"/>
+	<!-- new_bean -->
