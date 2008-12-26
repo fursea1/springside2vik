@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts-config PUBLIC
+		"-//Apache Software Foundation//DTD Struts Configuration 1.2//EN"
+		"http://struts.apache.org/dtds/struts-config_1_2.dtd">
+<struts-config>
+	<form-beans>
+		<form-bean name="logForm" type="org.apache.struts.validator.LazyValidatorForm"/>
+		<form-bean name="masterFunctionForm" type="org.apache.struts.validator.LazyValidatorForm"/>
+		<form-bean name="subFunctionForm" type="org.apache.struts.validator.LazyValidatorForm"/>
+		<form-bean name="userForm" type="org.apache.struts.validator.LazyValidatorForm"/>
+		<form-bean name="roleForm" type="org.apache.struts.validator.LazyValidatorForm"/>
+		<!-- new_form_bean -->
+	</form-beans>
+
+	<action-mappings>
+		<!--使用通配符进行批量配置，使用通配符的action都以/d_开头
+		**可以匹配/，因此路径可以是多级的
+		例如：访问路径/d_security/log，其中{1}：security {2}：log
+		组成的jsp路径就为/WEB-INF/pages/security/log/logList.jsp
+		-->
+		<action path="/d_**/*" name="{2}Form" parameter="method" scope="request" validate="false">
+			<forward name="list" path="/WEB-INF/pages/{1}/{2}/{2}List.jsp"/>
+			<forward name="edit" path="/WEB-INF/pages/{1}/{2}/{2}Form.jsp"/>
+			<forward name="view" path="/WEB-INF/pages/{1}/{2}/{2}View.jsp"/>
+			<forward name="success" path="/d_{1}/{2}.do" redirect="true"/>
+		</action>
+		
+		<!-- 这是列一种方式的配置
+		action的路径统一在action里写死，这样比较容易重载等
+		<action path="/d_*" name="{1}Form" parameter="method" scope="request" validate="false">
+		</action>
+		-->
+	</action-mappings>
+
+</struts-config>
